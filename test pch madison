@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Survey — Demo</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root{
+      --accent:#0b74de;
+      --card:#fff;
+      --bg:#f4f6fb;
+      --muted:#666;
+    }
+    body{font-family:Inter,system-ui,Segoe UI,Arial;margin:0;background:var(--bg);color:#222}
+    header{background:linear-gradient(90deg,#0b74de 0%, #5fb4ff 100%);color:white;padding:28px}
+    .wrap{max-width:980px;margin:20px auto;padding:18px}
+    .hero{display:flex;gap:16px;align-items:center}
+    .hero img{width:180px;height:120px;object-fit:cover;border-radius:8px;box-shadow:0 6px 18px rgba(10,10,30,0.08)}
+    h1{margin:0 0 6px 0}
+    p.lead{margin:0;color:rgba(255,255,255,0.95)}
+
+    /* Questionnaire styling */
+    section#questionnaire{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(10,10,30,0.04);margin-top:18px}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+    .main-left{padding:8px}
+    .form-row{margin-bottom:12px}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    input[type="text"], input[type="email"], select, textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e0e6f0}
+    button.cta{background:var(--accent);color:white;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
+
+    /* horizontal side-scroll questions */
+    .side-scroll{display:flex;overflow-x:auto;gap:12px;padding:12px 0}
+    .panel{min-width:260px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 4px 12px rgba(10,10,30,0.04);flex:0 0 auto}
+    .panel h4{margin:0 0 8px 0}
+    .small-muted{font-size:0.9rem;color:var(--muted)}
+
+    /* submissions list */
+    .subs{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+    .sub{display:flex;align-items:center;gap:12px}
+    .badge{width:38px;height:38px;border-radius:50%;background:#0b74de;color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+    @media(max-width:920px){
+      .grid{grid-template-columns:1fr;gap:12px}
+      .hero{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="wrap hero">
+      <div>
+        <h1>Community Project Feedback</h1>
+        <p class="lead">Share your opinion. Your email stays private — only initials display publicly.</p>
+        <p style="margin-top:12px;font-size:0.9rem;opacity:0.95">This demo updates a pie chart locally. To aggregate across visitors use Supabase or a similar backend (instructions below).</p>
+      </div>
+      <img src="https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=9c42d7f7b7f3d0f2e8b3b6c4c5b12f27" alt="project image">
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="questionnaire">
+      <div class="grid">
+        <!-- LEFT: form -->
+        <div class="main-left">
+          <form id="surveyForm">
+            <div class="form-row">
+              <label for="fullname">Full name</label>
+              <input id="fullname" name="fullname" type="text" required placeholder="First Last">
+            </div>
+
+            <div class="form-row">
+              <label for="email">Email (kept private)</label>
+              <input id="email" name="email" type="email" required placeholder="name@example.com">
+            </div>
+
+            <div class="form-row">
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" placeholder="City, State">
+            </div>
+
+            <div class="form-row">
+              <label for="primary">Do you want this project done?</label>
+              <select id="primary" name="primary" required>
+                <option value="">Choose</option>
+                <option value="yes">Yes — support it</option>
+                <option value="no">No — oppose it</option>
+                <option value="unsure">Unsure</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label>Why do you feel that way? (short)</label>
+              <textarea id="reason" name="reason" rows="3" placeholder="Optional comment..."></textarea>
+            </div>
+
+            <div class="form-row">
+              <button class="cta" type="submit">Submit</button>
+              <button type="button" id="clearLocal" style="margin-left:8px">Clear local demo data</button>
+            </div>
+
+            <small class="small-muted">Your email is stored privately (not displayed). Public display uses only initials.</small>
+          </form>
+
+          <!-- Local submissions shown (initials only) -->
+          <div style="margin-top:18px">
+            <h3>Recent public responses</h3>
+            <div id="subs" class="subs"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: chart + side-scroll extra panels -->
+        <aside>
+          <div style="background:white;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(10,10,30,0.04)">
+            <h3 style="margin:0 0 8px 0">Current vote (pie)</h3>
+            <canvas id="pieChart" width="300" height="300" aria-label="Responses pie chart"></canvas>
+            <div style="display:flex;justify-content:space-between;margin-top:10px">
+              <div><strong id="countYes">0</strong><div class="small-muted">Yes</div></div>
+              <div><strong id="countNo">0</strong><div class="small-muted">No</div></div>
+              <div><strong id="countUnsure">0</strong><div class="small-muted">Unsure</div></div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div style="background:white;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(10,10,30,0.04)">
+            <h3 style="margin:0 0 8px 0">More questions</h3>
+            <div class="side-scroll" id="sidePanels">
+              <div class="panel" data-panel="1">
+                <h4>Funding source</h4>
+                <select id="funding" aria-label="funding choice">
+                  <option value="">Choose</option>
+                  <option value="tax">Increase taxes</option>
+                  <option value="bond">Bonds</option>
+                  <option value="private">Private donations</option>
+                </select>
+                <p class="small-muted" style="margin-top:8px">This panel is optional; visible by default.</p>
+              </div>
+
+              <div class="panel" data-panel="2">
+                <h4>Timeline preference</h4>
+                <div><label><input type="radio" name="timeline" value="fast"> Fast</label></div>
+                <div><label><input type="radio" name="timeline" value="medium"> Medium</label></div>
+                <div><label><input type="radio" name="timeline" value="slow"> Slow</label></div>
+              </div>
+
+              <div class="panel" data-panel="3" id="followPanel">
+                <h4>Want updates?</h4>
+                <p class="small-muted">If you allow, we can send push notifications. (Requires enabling in your browser.)</p>
+                <button id="enablePush" class="cta" style="padding:8px 10px">Enable browser push</button>
+              </div>
+
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  /*****************************************************************************
+   * CONFIGURATION
+   *
+   * If you want to send submissions to a real backend (recommended for shared stats
+   * and for sending emails/notifications), set up Supabase (or Formspree, Netlify, etc.)
+   * and paste the values below.
+   *
+   * - If SUPABASE_URL and SUPABASE_KEY are left empty, this demo will store data
+   *   only in the visitor's localStorage (private to their browser).
+   *
+   * Replace placeholders if you have a Supabase project:
+   *   https://supabase.com/docs/guides/functions/examples/send-emails
+   *****************************************************************************/
+  const SUPABASE_URL = ""; // e.g. "https://xyzcompany.supabase.co"
+  const SUPABASE_KEY = ""; // anon/public key or service role key (careful!)
+  const SUPABASE_TABLE = "submissions"; // table name to store submissions (create in Supabase)
+
+  // Firebase FCM VAPID key & config (only needed for push)
+  const FIREBASE_CONFIG = {
+    apiKey: "", // replace with your firebase config
+    authDomain: "",
+    projectId: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+  const FCM_VAPID_KEY = ""; // public VAPID key for web push (if you set up FCM)
+
+  // Formspree endpoint fallback (just posts to Formspree to forward email)
+  // Create a form on https://formspree.io and set FORM_ID to the id they give you, or leave blank.
+  const FORMSPREE_FORM_ID = ""; // e.g. "mrgvldwe" (only used to send email fallback)
+  /*****************************************************************************/
+
+  // --- Utility: initials
+  function initialsFromName(name){
+    if(!name) return "";
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0] || "";
+    const last = parts.length>1 ? parts[parts.length-1] : "";
+    return (first.charAt(0) + (last.charAt(0)|| "")).toUpperCase();
+  }
+
+  // --- Chart setup
+  const ctx = document.getElementById("pieChart").getContext("2d");
+  const chartData = {labels:["Yes","No","Unsure"],datasets:[{data:[0,0,0],backgroundColor:["#2ecc71","#e74c3c","#f1c40f"]}]};
+  const pie = new Chart(ctx, {
+    type:"pie",
+    data: chartData,
+    options:{plugins:{legend:{position:"bottom"}}}
+  });
+
+  // --- Data storage: local demo aggregated counts
+  const STORAGE_KEY = "project_survey_demo_v1";
+
+  function loadLocal(){
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return {subs:[],counts:{yes:0,no:0,unsure:0}};
+    try{ return JSON.parse(raw); }catch(e){ return {subs:[],counts:{yes:0,no:0,unsure:0}}; }
+  }
+  function saveLocal(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+
+  let store = loadLocal();
+
+  function renderSubs(){
+    const container = document.getElementById("subs");
+    container.innerHTML = "";
+    (store.subs || []).slice().reverse().slice(0,20).forEach(s=>{
+      const el = document.createElement("div"); el.className="sub";
+      el.innerHTML = `<div class="badge">${s.initials}</div>
+                      <div>
+                        <div style="font-weight:700">${s.city||"—"}</div>
+                        <div class="small-muted">${s.reason ? s.reason.slice(0,80) : ""}</div>
+                      </div>`;
+      container.appendChild(el);
+    });
+  }
+
+  function updateChart(){
+    const c = store.counts || {yes:0,no:0,unsure:0};
+    pie.data.datasets[0].data = [c.yes,c.no,c.unsure];
+    pie.update();
+
+    document.getElementById("countYes").textContent = c.yes;
+    document.getElementById("countNo").textContent = c.no;
+    document.getElementById("countUnsure").textContent = c.unsure;
+  }
+
+  renderSubs();
+  updateChart();
+
+  // --- Form submit handling
+  document.getElementById("surveyForm").addEventListener("submit", async function(ev){
+    ev.preventDefault();
+    const fullname = document.getElementById("fullname").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const primary = document.getElementById("primary").value;
+    const reason = document.getElementById("reason").value.trim();
+
+    if(!fullname || !email || !primary){ alert("Please fill name, email, and choose Yes/No/Unsure."); return; }
+
+    const initials = initialsFromName(fullname);
+    // Local store update
+    store.subs = store.subs || [];
+    store.subs.push({initials,city,primary,reason,t:Date.now()});
+    store.counts = store.counts || {yes:0,no:0,unsure:0};
+    if(primary==="yes") store.counts.yes++;
+    else if(primary==="no") store.counts.no++;
+    else store.counts.unsure++;
+
+    saveLocal(store);
+    renderSubs();
+    updateChart();
+
+    // Attempt to POST to Supabase if configured (so multiple visitors can share data)
+    if(SUPABASE_URL && SUPABASE_KEY){
+      try{
+        // Insert row into table. The table should have columns: fullname, email, city, primary, reason, initials, created_at
+        await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+          method:"POST",
+          headers:{
+            "Content-Type":"application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify([{fullname, email, city, primary, reason, initials}])
+        });
+        // Optionally: fetch aggregated counts from Supabase and update chart (left as exercise)
+      }catch(err){
+        console.warn("Supabase post failed", err);
+      }
+    } else if(FORMSPREE_FORM_ID){
+      // fallback: submit to Formspree to send you an email copy (doesn't create shared DB)
+      try{
+        await fetch(`https://formspree.io/f/${FORMSPREE_FORM_ID}`, {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({fullname,email,city,primary,reason})
+        });
+      }catch(e){console.warn("Formspree fallback failed", e)}
+    }
+
+    // Clear form fields but keep email if you want
+    document.getElementById("reason").value = "";
+    document.getElementById("primary").value = "";
+    document.getElementById("fullname").value = "";
+    // optional: keep email to allow repeated submissions
+    alert("Thanks — your response was recorded (demo).");
+  });
+
+  document.getElementById("clearLocal").addEventListener("click", function(){ if(confirm("Clear local demo data? This removes only your browser's stored demo results.")){ store = {subs:[],counts:{yes:0,no:0,unsure:0}}; saveLocal(store); renderSubs(); updateChart(); }});
+
+  // --- Side panels logic: show/hide panels depending on answers (demo)
+  const side = document.getElementById("sidePanels");
+  document.getElementById("primary").addEventListener("change", function(){
+    const val = this.value;
+    // Demo logic: if 'yes', show funding panel first; if 'no' show timeline; if unsure show both.
+    [...side.querySelectorAll(".panel")].forEach(p=>{ p.style.display="block"; });
+    // We keep it simple — in a real app you'd show/hide or reorder
+  });
+
+  // --- Push enable (client-side registration) using Firebase FCM
+  document.getElementById("enablePush").addEventListener("click", async function(){
+    if(!FIREBASE_CONFIG.apiKey || !FCM_VAPID_KEY){ alert("Push not configured — paste your Firebase config and FCM VAPID key into the top of the page."); return; }
+    if(!('serviceWorker' in navigator)){ alert("Service workers not supported in this browser."); return; }
+
+    try{
+      // Register the service worker file included with this repo
+      const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      console.log("Service worker registered", reg);
+      // Request notification permission
+      const perm = await Notification.requestPermission();
+      if(perm !== "granted"){ alert("Notifications blocked. Please allow them in your browser to receive push updates."); return; }
+
+      // Initialize Firebase & FCM client to get token (we dynamically load the SDK)
+      await loadScript("https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js");
+      await loadScript("https://www.gstatic.com/firebasejs/9.24.0/firebase-messaging-compat.js");
+      window.firebase.initializeApp(FIREBASE_CONFIG);
+      const messaging = window.firebase.messaging();
+      const token = await messaging.getToken({vapidKey: FCM_VAPID_KEY});
+      console.log("FCM token:", token);
+      alert("Push enabled (demo). Token logged to console. To send push notifications you'll need a server or Firebase console to target this token.");
+      // Save token to your backend tied to the user's email so you can push later
+    }catch(err){
+      console.error("Push enable failed", err);
+      alert("Push enable failed; see console for details.");
+    }
+  });
+
+  function loadScript(src){
+    return new Promise((res,rej)=>{
+      const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);
+    });
+  }
+
+  // Optional: attempt to fetch aggregated counts from Supabase (if you want live shared chart)
+  async function fetchAggregatedFromSupabase(){
+    if(!SUPABASE_URL || !SUPABASE_KEY) return;
+    try{
+      // example: use RPC or an aggregated select. Here we use simple count queries (this requires appropriate CORS / policies)
+      // -> left as comments because public anon keys might be limited.
+      // const r = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=primary`, {...});
+      // process and update store.counts accordingly, then updateChart()
+    }catch(e){console.warn("fetch aggregated failed", e)}
+  }
+
+  // initial attempt (no-op if not configured)
+  fetchAggregatedFromSupabase();
+
+  </script>
+</body>
+</html>
