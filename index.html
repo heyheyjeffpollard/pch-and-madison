@@ -1,355 +1,243 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Changing the Left Turn Signal Light into a Yield Signal Light.</title>
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changing the Left Turn Signal Light into a Yield Signal Light</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root{
-      --accent:#0b74de;
-      --card:#fff;
-      --bg:#f4f6fb;
-      --muted:#666;
-    }
-    body{
-      font-family:Inter,system-ui,Segoe UI,Arial;
-      margin:0;
-      background:var(--bg);
-      color:#222;
-    }
-    header{
-      background:linear-gradient(90deg,#0b74de 0%, #5fb4ff 100%);
-      color:white;
-      padding:28px;
-    }
-    .wrap{max-width:980px;margin:20px auto;padding:18px}
-    .hero{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-    .hero img{
-      width:100%;
-      max-width:380px;
-      height:auto;
-      border-radius:8px;
-      box-shadow:0 6px 18px rgba(10,10,30,0.08);
-      cursor:pointer;
-      transition:transform 0.2s ease;
-    }
-    .hero img:hover{transform:scale(1.02)}
-    h1{margin:0 0 6px 0}
-    p.lead{margin:0;color:rgba(255,255,255,0.95)}
-
-    /* Questionnaire styling */
-    section#questionnaire{
-      background:var(--card);
-      padding:18px;
-      border-radius:12px;
-      box-shadow:0 6px 18px rgba(10,10,30,0.04);
-      margin-top:18px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 320px;
-      gap:16px;
-    }
-    .main-left{padding:8px}
-    .form-row{margin-bottom:12px}
-    label{display:block;font-weight:600;margin-bottom:6px}
-    input[type="text"], input[type="email"], select, textarea{
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid #e0e6f0;
-    }
-    input[type="file"]{
-      display:block;
-      margin-top:6px;
-    }
-    button.cta{
-      background:var(--accent);
-      color:white;
-      border:0;
-      padding:10px 14px;
-      border-radius:10px;
-      cursor:pointer;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.5;
     }
 
-    /* horizontal side-scroll questions */
-    .side-scroll{
-      display:flex;
-      overflow-x:auto;
-      gap:12px;
-      padding:12px 0;
-    }
-    .panel{
-      min-width:260px;
-      background:#fff;
-      border-radius:10px;
-      padding:12px;
-      box-shadow:0 4px 12px rgba(10,10,30,0.04);
-      flex:0 0 auto;
-    }
-    .panel h4{margin:0 0 8px 0}
-    .small-muted{font-size:0.9rem;color:var(--muted)}
-
-    /* submissions list */
-    .subs{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-    .sub{display:flex;align-items:center;gap:12px}
-    .badge{
-      width:38px;height:38px;border-radius:50%;
-      background:#0b74de;color:white;
-      display:flex;align-items:center;justify-content:center;
-      font-weight:700;
+    header {
+      background: #1a73e8;
+      color: white;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 1.2rem;
     }
 
-    /* Modal image viewer */
-    .lightbox{
-      position:fixed;
-      top:0;left:0;right:0;bottom:0;
-      background:rgba(0,0,0,0.8);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-    }
-    .lightbox img{
-      max-width:90%;
-      max-height:90%;
-      border-radius:10px;
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    /* responsive grid for smaller screens */
-    @media(max-width:920px){
-      .grid{grid-template-columns:1fr;gap:12px}
-      .hero{flex-direction:column;align-items:flex-start}
+    .image-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .main-image {
+      width: 100%;
+      max-width: 700px;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
+    }
+
+    .main-image.enlarged {
+      transform: scale(1.8);
+      z-index: 1000;
+      position: relative;
+      cursor: zoom-out;
+    }
+
+    .upload-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .upload-preview {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .map-link {
+      display: block;
+      background-color: #34a853;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .map-link:hover {
+      background-color: #2c8c46;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    input, select, textarea, button {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    button {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #155ab6;
+    }
+
+    .chart-container {
+      margin-top: 30px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .responses {
+      margin-top: 20px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 1rem;
+        padding: 1rem;
+      }
+      .main-image.enlarged {
+        transform: scale(1.4);
+      }
     }
   </style>
 </head>
 <body>
-
   <header>
-    <div class="wrap hero">
-      <div>
-        <h1>Changing the Left Turn Signal Light into a Yield Signal Light.</h1>
-        <p class="lead">Share your opinion. Your email stays private — only initials display publicly.</p>
-        <p style="margin-top:12px;font-size:0.9rem;opacity:0.95">This demo updates a pie chart locally. To aggregate across visitors use Supabase or a similar backend (instructions below).</p>
-        <p style="margin-top:10px;">
-          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=37.4219999,-122.0840575"
-             target="_blank"
-             style="color:#fff;text-decoration:underline;">View Location on Google Street View</a>
-        </p>
-      </div>
-      <img id="mainImage"
-        src="https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=600&auto=format&fit=crop"
-        alt="project image">
-    </div>
+    Changing the Left Turn Signal Light into a Yield Signal Light
   </header>
 
-  <main class="wrap">
-    <section id="questionnaire">
-      <div class="grid">
-        <!-- LEFT: form -->
-        <div class="main-left">
-          <form id="surveyForm">
-            <div class="form-row">
-              <label for="fullname">Full name</label>
-              <input id="fullname" name="fullname" type="text" required placeholder="First Last">
-            </div>
+  <main>
+    <div class="image-container">
+      <img src="https://via.placeholder.com/700x400?text=Proposed+Signal+Change+Location" alt="Project Image" class="main-image" id="mainImage">
+    </div>
 
-            <div class="form-row">
-              <label for="email">Email (kept private)</label>
-              <input id="email" name="email" type="email" required placeholder="name@example.com">
-            </div>
+    <div class="upload-container">
+      <label for="photoUpload">Upload a photo (optional):</label>
+      <input type="file" id="photoUpload" accept="image/*">
+      <img id="photoPreview" class="upload-preview" style="display:none;">
+    </div>
 
-            <div class="form-row">
-              <label for="city">City</label>
-              <input id="city" name="city" type="text" placeholder="City, State">
-            </div>
+    <a class="map-link" href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu" target="_blank">
+      🌎 View Location on Google Street View
+    </a>
 
-            <div class="form-row">
-              <label for="photo">Upload a photo (optional)</label>
-              <input id="photo" name="photo" type="file" accept="image/*">
-            </div>
+    <form id="surveyForm">
+      <input type="text" id="name" placeholder="Full Name" required>
+      <input type="email" id="email" placeholder="Email (not public)" required>
+      <input type="text" id="city" placeholder="City of Residence" required>
 
-            <div class="form-row">
-              <label for="primary">Do you want this project done?</label>
-              <select id="primary" name="primary" required>
-                <option value="">Choose</option>
-                <option value="yes">Yes — support it</option>
-                <option value="no">No — oppose it</option>
-                <option value="unsure">Unsure</option>
-              </select>
-            </div>
+      <label>Do you support changing the signal?</label>
+      <select id="support" required>
+        <option value="">Select...</option>
+        <option value="yes">Yes, I support it</option>
+        <option value="no">No, I do not support it</option>
+      </select>
 
-            <div class="form-row">
-              <label>Why do you feel that way? (short)</label>
-              <textarea id="reason" name="reason" rows="3" placeholder="Optional comment..."></textarea>
-            </div>
+      <label>Additional Comments:</label>
+      <textarea id="comments" rows="3" placeholder="Your thoughts..."></textarea>
 
-            <div class="form-row">
-              <button class="cta" type="submit">Submit</button>
-              <button type="button" id="clearLocal" style="margin-left:8px">Clear local demo data</button>
-            </div>
+      <button type="submit">Submit Response</button>
+    </form>
 
-            <small class="small-muted">Your email is stored privately (not displayed). Public display uses only initials.</small>
-          </form>
+    <div class="chart-container">
+      <canvas id="supportChart"></canvas>
+    </div>
 
-          <!-- Local submissions shown (initials only) -->
-          <div style="margin-top:18px">
-            <h3>Recent public responses</h3>
-            <div id="subs" class="subs"></div>
-          </div>
-        </div>
-
-        <!-- RIGHT: chart + side-scroll extra panels -->
-        <aside>
-          <div style="background:white;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(10,10,30,0.04)">
-            <h3 style="margin:0 0 8px 0">Current vote (pie)</h3>
-            <canvas id="pieChart" width="300" height="300" aria-label="Responses pie chart"></canvas>
-            <div style="display:flex;justify-content:space-between;margin-top:10px">
-              <div><strong id="countYes">0</strong><div class="small-muted">Yes</div></div>
-              <div><strong id="countNo">0</strong><div class="small-muted">No</div></div>
-              <div><strong id="countUnsure">0</strong><div class="small-muted">Unsure</div></div>
-            </div>
-          </div>
-
-          <div style="height:12px"></div>
-
-          <div style="background:white;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(10,10,30,0.04)">
-            <h3 style="margin:0 0 8px 0">More questions</h3>
-            <div class="side-scroll" id="sidePanels">
-              <div class="panel" data-panel="1">
-                <h4>Funding source</h4>
-                <select id="funding" aria-label="funding choice">
-                  <option value="">Choose</option>
-                  <option value="tax">Increase taxes</option>
-                  <option value="bond">Bonds</option>
-                  <option value="private">Private donations</option>
-                </select>
-                <p class="small-muted" style="margin-top:8px">Optional; visible by default.</p>
-              </div>
-
-              <div class="panel" data-panel="2">
-                <h4>Timeline preference</h4>
-                <div><label><input type="radio" name="timeline" value="fast"> Fast</label></div>
-                <div><label><input type="radio" name="timeline" value="medium"> Medium</label></div>
-                <div><label><input type="radio" name="timeline" value="slow"> Slow</label></div>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </section>
+    <div class="responses" id="responses"></div>
   </main>
 
-  <!-- Lightbox Modal -->
-  <div id="lightbox" class="lightbox">
-    <img src="" alt="expanded view">
-  </div>
-
   <script>
-  // Chart setup
-  const ctx = document.getElementById("pieChart").getContext("2d");
-  const chartData = {
-    labels:["Yes","No","Unsure"],
-    datasets:[{data:[0,0,0],backgroundColor:["#2ecc71","#e74c3c","#f1c40f"]}]
-  };
-  const pie = new Chart(ctx, {
-    type:"pie",
-    data: chartData,
-    options:{plugins:{legend:{position:"bottom"}}}
-  });
-
-  const STORAGE_KEY = "project_survey_demo_v2";
-  function loadLocal(){
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return {subs:[],counts:{yes:0,no:0,unsure:0}};
-    try{ return JSON.parse(raw);}catch(e){return {subs:[],counts:{yes:0,no:0,unsure:0}};}
-  }
-  function saveLocal(data){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}
-  let store = loadLocal();
-
-  function initialsFromName(name){
-    if(!name) return "";
-    const parts=name.trim().split(/\s+/);
-    const f=parts[0]||"", l=parts[parts.length-1]||"";
-    return (f.charAt(0)+l.charAt(0)).toUpperCase();
-  }
-
-  function renderSubs(){
-    const container=document.getElementById("subs");
-    container.innerHTML="";
-    (store.subs||[]).slice().reverse().slice(0,20).forEach(s=>{
-      const el=document.createElement("div"); el.className="sub";
-      el.innerHTML=`<div class="badge">${s.initials}</div>
-                    <div>
-                      <div style="font-weight:700">${s.city||"—"}</div>
-                      <div class="small-muted">${s.reason?s.reason.slice(0,80):""}</div>
-                      ${s.photo ? `<img src="${s.photo}" style="width:60px;height:60px;border-radius:6px;object-fit:cover;margin-top:4px;">`:""}
-                    </div>`;
-      container.appendChild(el);
+    // Image enlarge feature
+    const mainImage = document.getElementById('mainImage');
+    mainImage.addEventListener('click', () => {
+      mainImage.classList.toggle('enlarged');
     });
-  }
-  function updateChart(){
-    const c=store.counts||{yes:0,no:0,unsure:0};
-    pie.data.datasets[0].data=[c.yes,c.no,c.unsure];
-    pie.update();
-    document.getElementById("countYes").textContent=c.yes;
-    document.getElementById("countNo").textContent=c.no;
-    document.getElementById("countUnsure").textContent=c.unsure;
-  }
-  renderSubs(); updateChart();
 
-  document.getElementById("surveyForm").addEventListener("submit",e=>{
-    e.preventDefault();
-    const fullname=document.getElementById("fullname").value.trim();
-    const email=document.getElementById("email").value.trim();
-    const city=document.getElementById("city").value.trim();
-    const primary=document.getElementById("primary").value;
-    const reason=document.getElementById("reason").value.trim();
-    const file=document.getElementById("photo").files[0];
+    // Photo upload preview
+    const photoUpload = document.getElementById('photoUpload');
+    const photoPreview = document.getElementById('photoPreview');
+    photoUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          photoPreview.src = event.target.result;
+          photoPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
-    if(!fullname||!email||!primary){alert("Please fill name, email, and choose Yes/No/Unsure.");return;}
+    // Initialize chart
+    const ctx = document.getElementById('supportChart').getContext('2d');
+    const chartData = { yes: 0, no: 0 };
+    const chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Support', 'Do Not Support'],
+        datasets: [{
+          data: [0, 0],
+          backgroundColor: ['#1a73e8', '#e84545']
+        }]
+      }
+    });
 
-    const initials=initialsFromName(fullname);
-    let photoData="";
-    if(file){
-      const reader=new FileReader();
-      reader.onload=function(evt){
-        photoData=evt.target.result;
-        pushData();
-      };
-      reader.readAsDataURL(file);
-    }else pushData();
+    // Form submission
+    const form = document.getElementById('surveyForm');
+    const responsesDiv = document.getElementById('responses');
 
-    function pushData(){
-      store.subs.push({initials,city,primary,reason,photo:photoData,t:Date.now()});
-      if(primary==="yes")store.counts.yes++;
-      else if(primary==="no")store.counts.no++;
-      else store.counts.unsure++;
-      saveLocal(store); renderSubs(); updateChart();
-      document.getElementById("surveyForm").reset();
-      alert("Thanks — your response was recorded (demo).");
-    }
-  });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const support = document.getElementById('support').value;
+      const comments = document.getElementById('comments').value.trim();
 
-  document.getElementById("clearLocal").addEventListener("click",()=>{
-    if(confirm("Clear local demo data?")){
-      store={subs:[],counts:{yes:0,no:0,unsure:0}};
-      saveLocal(store); renderSubs(); updateChart();
-    }
-  });
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+      responsesDiv.innerHTML += `<p><strong>${initials}</strong> from ${city} — <em>${support === 'yes' ? 'Supports' : 'Does not support'}</em></p>`;
 
-  // Image enlarge (lightbox)
-  const lightbox=document.getElementById("lightbox");
-  const mainImage=document.getElementById("mainImage");
-  mainImage.addEventListener("click",()=>{
-    lightbox.querySelector("img").src=mainImage.src;
-    lightbox.style.display="flex";
-  });
-  lightbox.addEventListener("click",()=>lightbox.style.display="none");
+      chartData[support]++;
+      chart.data.datasets[0].data = [chartData.yes, chartData.no];
+      chart.update();
+
+      form.reset();
+      photoPreview.style.display = 'none';
+    });
   </script>
 </body>
 </html>
