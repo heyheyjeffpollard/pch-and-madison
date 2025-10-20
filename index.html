@@ -96,8 +96,8 @@
       background: #005bb5;
     }
 
-    #piechart {
-      max-width: 500px;
+    #barchart {
+      max-width: 600px;
       margin: 0 auto;
     }
 
@@ -116,6 +116,24 @@
       width: 95%;
       max-width: 900px;
       border-radius: 10px;
+    }
+
+    .choice-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .scroll-section {
+      display: none;
+      margin-top: 20px;
+      animation: slideIn 0.5s ease forwards;
+    }
+
+    @keyframes slideIn {
+      from {opacity: 0; transform: translateX(50px);}
+      to {opacity: 1; transform: translateX(0);}
     }
 
     @media (max-width: 768px) {
@@ -144,91 +162,93 @@
 
   <main>
     <section>
-      <h2>Community Feedback Form</h2>
-      <form id="surveyForm">
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" required>
+      <h2>Community Choice</h2>
+      <p>Should the current left turn signal remain as-is or be changed to a yield signal?</p>
+      <div class="choice-buttons">
+        <button onclick="showSection('keep')">Keep</button>
+        <button onclick="showSection('change')">Change</button>
+      </div>
 
-        <label for="email">Email (kept private):</label>
-        <input type="email" id="email" required>
+      <!-- Keep Section -->
+      <div id="keep-section" class="scroll-section">
+        <h3>Why do you want to keep it?</h3>
+        <form id="keepForm">
+          <label for="keepReason">Your Reason:</label>
+          <textarea id="keepReason" rows="4" placeholder="Share your thoughts..."></textarea>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
 
-        <label for="city">City of Residence:</label>
-        <input type="text" id="city" required>
+      <!-- Change Section -->
+      <div id="change-section" class="scroll-section">
+        <h3>Provide Your Information</h3>
+        <form id="changeForm">
+          <label for="name">Full Name:</label>
+          <input type="text" id="name" required>
 
-        <label for="photoUpload">Upload Photo (optional):</label>
-        <input type="file" id="photoUpload" accept="image/*">
+          <label for="email">Email (kept private):</label>
+          <input type="email" id="email" required>
 
-        <label>Do you want this project done?</label>
-        <select id="vote" required>
-          <option value="">Select one</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+          <label for="city">Resident City:</label>
+          <input type="text" id="city" required>
 
-        <label for="comments">Comments:</label>
-        <textarea id="comments" rows="4"></textarea>
-
-        <button type="submit">Submit Response</button>
-      </form>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
     </section>
 
     <section>
-      <h2>Community Support Chart</h2>
-      <canvas id="piechart"></canvas>
-    </section>
-
-    <section>
-      <h3>Responses (Initials and City)</h3>
-      <ul id="responses"></ul>
+      <h2>Community Opinion Bar Graph</h2>
+      <canvas id="barchart"></canvas>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    const ctx = document.getElementById('piechart').getContext('2d');
-    let yesVotes = 0;
-    let noVotes = 0;
+    const ctx = document.getElementById('barchart').getContext('2d');
+    let keepCount = 0;
+    let changeCount = 0;
 
-    const chart = new Chart(ctx, {
-      type: 'pie',
+    const barChart = new Chart(ctx, {
+      type: 'bar',
       data: {
-        labels: ['Yes', 'No'],
+        labels: ['Keep', 'Change'],
         datasets: [{
-          data: [yesVotes, noVotes],
+          label: 'Number of Responses',
+          data: [keepCount, changeCount],
           backgroundColor: ['#4CAF50', '#F44336'],
         }]
       },
       options: {
         responsive: true,
-        plugins: { legend: { position: 'bottom' } }
+        scales: {
+          y: { beginAtZero: true, precision: 0 }
+        }
       }
     });
 
-    const form = document.getElementById('surveyForm');
-    const responsesList = document.getElementById('responses');
+    function showSection(choice) {
+      document.getElementById('keep-section').style.display = 'none';
+      document.getElementById('change-section').style.display = 'none';
+      document.getElementById(choice + '-section').style.display = 'block';
+    }
 
-    form.addEventListener('submit', e => {
+    document.getElementById('keepForm').addEventListener('submit', e => {
       e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const city = document.getElementById('city').value.trim();
-      const vote = document.getElementById('vote').value;
-      const comments = document.getElementById('comments').value.trim();
-      const photo = document.getElementById('photoUpload').files[0];
+      keepCount++;
+      barChart.data.datasets[0].data = [keepCount, changeCount];
+      barChart.update();
+      alert('Thank you for your feedback on keeping the light.');
+      e.target.reset();
+    });
 
-      if (vote === 'yes') yesVotes++;
-      else if (vote === 'no') noVotes++;
-
-      chart.data.datasets[0].data = [yesVotes, noVotes];
-      chart.update();
-
-      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-      const li = document.createElement('li');
-      li.textContent = `${initials} (${city}) - ${vote === 'yes' ? 'Supports' : 'Does not support'} project`;
-      responsesList.appendChild(li);
-
-      form.reset();
-      alert('Thank you! Your response has been recorded.');
+    document.getElementById('changeForm').addEventListener('submit', e => {
+      e.preventDefault();
+      changeCount++;
+      barChart.data.datasets[0].data = [keepCount, changeCount];
+      barChart.update();
+      alert('Thank you! Your response to change has been recorded.');
+      e.target.reset();
     });
 
     function enlargeImage(img) {
