@@ -4,261 +4,266 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Changing the Left Turn Signal Light into a Yield Signal Light</title>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      background: #f5f5f5;
+      padding: 0;
+      background-color: #f9f9f9;
       color: #333;
     }
 
     header {
-      text-align: center;
-      background: #004d99;
+      background: #003366;
       color: white;
-      padding: 20px;
+      text-align: center;
+      padding: 30px 20px;
     }
 
     header h1 {
-      margin-bottom: 10px;
-      font-size: 1.8em;
+      font-size: 2em;
+      margin-bottom: 20px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      letter-spacing: 1px;
     }
 
-    header img.main-image {
-      width: 90%;
-      max-width: 900px;
+    header img {
+      max-width: 90%;
+      height: auto;
       border-radius: 10px;
+      margin-top: 10px;
       cursor: pointer;
       transition: transform 0.3s ease;
     }
 
-    header img.main-image:hover {
-      transform: scale(1.03);
-    }
-
-    .street-view-link {
-      display: inline-block;
-      margin-top: 10px;
-      background: #0073e6;
-      color: white;
-      padding: 10px 16px;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background 0.3s;
-    }
-
-    .street-view-link:hover {
-      background: #005bb5;
+    header img:hover {
+      transform: scale(1.05);
     }
 
     main {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 15px;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .question-section {
+      margin-bottom: 40px;
+    }
+
+    .side-scroll {
+      display: flex;
+      overflow-x: auto;
+      gap: 20px;
+      padding: 10px;
+    }
+
+    .side-box {
+      min-width: 300px;
       background: white;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex-shrink: 0;
     }
 
-    section {
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
+    input, textarea {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
+      padding: 10px;
+      margin: 8px 0;
       border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-size: 1em;
+      border-radius: 5px;
     }
 
     button {
-      background: #0073e6;
+      background-color: #003366;
       color: white;
+      padding: 10px 15px;
       border: none;
-      padding: 10px 16px;
-      margin-top: 15px;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 1em;
+      margin-top: 10px;
     }
 
     button:hover {
-      background: #005bb5;
+      background-color: #00509e;
     }
 
-    #barchart {
+    .chart-container {
       max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .enlarged {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-
-    .enlarged img {
-      width: 95%;
-      max-width: 900px;
+      margin: 50px auto;
+      background: white;
       border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .choice-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
+    .map-link {
+      text-align: center;
+      margin: 20px 0;
     }
 
-    .scroll-section {
-      display: none;
-      margin-top: 20px;
-      animation: slideIn 0.5s ease forwards;
+    .map-link a {
+      color: #00509e;
+      font-weight: bold;
+      text-decoration: none;
     }
 
-    @keyframes slideIn {
-      from {opacity: 0; transform: translateX(50px);}
-      to {opacity: 1; transform: translateX(0);}
+    .map-link a:hover {
+      text-decoration: underline;
     }
 
     @media (max-width: 768px) {
-      header h1 {
-        font-size: 1.3em;
-      }
-      main {
-        margin: 10px;
-        padding: 10px;
-      }
+      header h1 { font-size: 1.6em; }
+      .side-box { min-width: 250px; }
+    }
+
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.3em; }
+    }
+
+    /* Modal for enlarged image */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.8);
+    }
+
+    .modal-content {
+      margin: 5% auto;
+      display: block;
+      width: 80%;
+      max-width: 800px;
+      border-radius: 10px;
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 35px;
+      color: white;
+      font-size: 40px;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #ccc;
     }
   </style>
 </head>
 
 <body>
   <header>
-    <h1>Changing the Left Turn Signal Light into a Yield Signal Light.</h1>
-    <img src="20251017_092217.jpg" alt="Street intersection at Madison" class="main-image" onclick="enlargeImage(this)">
-    <div class="header-links">
-      <a href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu&g_ep=EgoyMDI1MTAxNC4wIKXMDSoASAFQAw%3D%3D"
-         target="_blank" class="street-view-link">
-        View Location on Google Street View
-      </a>
-    </div>
+    <h1>Changing the Left Turn Signal Light into a Yield Signal Light</h1>
+    <img id="headerImage" src="20251017_092217.jpg" alt="Street intersection photo">
   </header>
 
   <main>
-    <section>
-      <h2>Community Choice</h2>
-      <p>Should the current left turn signal remain as-is or be changed to a yield signal?</p>
-      <div class="choice-buttons">
-        <button onclick="showSection('keep')">Keep</button>
-        <button onclick="showSection('change')">Change</button>
+    <div class="question-section">
+      <h2>Choose Your Action</h2>
+      <div class="side-scroll">
+        <div class="side-box">
+          <h3>Keep</h3>
+          <label for="whyKeep">Why?</label>
+          <textarea id="whyKeep" placeholder="Share your thoughts..."></textarea>
+          <button onclick="submitKeep()">Submit</button>
+        </div>
+
+        <div class="side-box">
+          <h3>Change</h3>
+          <label for="name">Name</label>
+          <input id="name" type="text" placeholder="Your name">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="Your email (kept private)">
+          <label for="city">Resident City</label>
+          <input id="city" type="text" placeholder="Your city">
+          <button onclick="submitChange()">Submit</button>
+        </div>
       </div>
+    </div>
 
-      <!-- Keep Section -->
-      <div id="keep-section" class="scroll-section">
-        <h3>Why do you want to keep it?</h3>
-        <form id="keepForm">
-          <label for="keepReason">Your Reason:</label>
-          <textarea id="keepReason" rows="4" placeholder="Share your thoughts..."></textarea>
-          <button type="submit">Submit</button>
-        </form>
-      </div>
+    <div class="map-link">
+      <a href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu" target="_blank">
+        View Location on Google Street View
+      </a>
+    </div>
 
-      <!-- Change Section -->
-      <div id="change-section" class="scroll-section">
-        <h3>Provide Your Information</h3>
-        <form id="changeForm">
-          <label for="name">Full Name:</label>
-          <input type="text" id="name" required>
-
-          <label for="email">Email (kept private):</label>
-          <input type="email" id="email" required>
-
-          <label for="city">Resident City:</label>
-          <input type="text" id="city" required>
-
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </section>
-
-    <section>
-      <h2>Community Opinion Bar Graph</h2>
-      <canvas id="barchart"></canvas>
-    </section>
+    <div class="chart-container">
+      <canvas id="voteChart"></canvas>
+    </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    const ctx = document.getElementById('barchart').getContext('2d');
-    let keepCount = 0;
-    let changeCount = 0;
+  <!-- Modal for enlarged image -->
+  <div id="imageModal" class="modal">
+    <span class="close" id="closeModal">&times;</span>
+    <img class="modal-content" id="modalImg">
+  </div>
 
-    const barChart = new Chart(ctx, {
+  <script>
+    let keepVotes = 0;
+    let changeVotes = 0;
+    const ctx = document.getElementById('voteChart').getContext('2d');
+    const voteChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['Keep', 'Change'],
         datasets: [{
-          label: 'Number of Responses',
-          data: [keepCount, changeCount],
-          backgroundColor: ['#4CAF50', '#F44336'],
+          label: 'Votes',
+          data: [keepVotes, changeVotes],
+          backgroundColor: ['#003366', '#007bff']
         }]
       },
       options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true, precision: 0 }
-        }
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { display: false } }
       }
     });
 
-    function showSection(choice) {
-      document.getElementById('keep-section').style.display = 'none';
-      document.getElementById('change-section').style.display = 'none';
-      document.getElementById(choice + '-section').style.display = 'block';
+    function updateChart() {
+      voteChart.data.datasets[0].data = [keepVotes, changeVotes];
+      voteChart.update();
     }
 
-    document.getElementById('keepForm').addEventListener('submit', e => {
-      e.preventDefault();
-      keepCount++;
-      barChart.data.datasets[0].data = [keepCount, changeCount];
-      barChart.update();
-      alert('Thank you for your feedback on keeping the light.');
-      e.target.reset();
-    });
+    function submitKeep() {
+      keepVotes++;
+      alert("Thank you for your feedback to Keep!");
+      updateChart();
+    }
 
-    document.getElementById('changeForm').addEventListener('submit', e => {
-      e.preventDefault();
-      changeCount++;
-      barChart.data.datasets[0].data = [keepCount, changeCount];
-      barChart.update();
-      alert('Thank you! Your response to change has been recorded.');
-      e.target.reset();
-    });
+    function submitChange() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const city = document.getElementById('city').value;
+      if (!name || !email || !city) {
+        alert("Please fill out all fields before submitting.");
+        return;
+      }
+      changeVotes++;
+      alert("Thank you for your input to Change!");
+      updateChart();
+    }
 
-    function enlargeImage(img) {
-      const overlay = document.createElement('div');
-      overlay.classList.add('enlarged');
-      const enlargedImg = document.createElement('img');
-      enlargedImg.src = img.src;
-      overlay.appendChild(enlargedImg);
-      document.body.appendChild(overlay);
-      overlay.onclick = () => overlay.remove();
+    // Image modal
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("headerImage");
+    const modalImg = document.getElementById("modalImg");
+    const closeModal = document.getElementById("closeModal");
+
+    img.onclick = function() {
+      modal.style.display = "block";
+      modalImg.src = this.src;
+    }
+
+    closeModal.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) modal.style.display = "none";
     }
   </script>
 </body>
