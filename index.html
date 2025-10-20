@@ -1,246 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Changing the Left Turn Signal Light into a Yield Signal Light</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #333;
       margin: 0;
-      padding: 0;
-      line-height: 1.5;
+      background: #f5f5f5;
+      color: #333;
     }
 
     header {
-      background: #1a73e8;
-      color: white;
       text-align: center;
-      padding: 1.5rem 1rem;
-      font-size: 1.2rem;
+      background: #004d99;
+      color: white;
+      padding: 20px;
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+      font-size: 1.8em;
+    }
+
+    header img.main-image {
+      width: 90%;
+      max-width: 900px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    header img.main-image:hover {
+      transform: scale(1.03);
+    }
+
+    .street-view-link {
+      display: inline-block;
+      margin-top: 10px;
+      background: #0073e6;
+      color: white;
+      padding: 10px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .street-view-link:hover {
+      background: #005bb5;
     }
 
     main {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .image-container {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .main-image {
-      width: 100%;
-      max-width: 700px;
-      border-radius: 10px;
-      transition: transform 0.3s ease;
-      cursor: zoom-in;
-    }
-
-    .main-image.enlarged {
-      transform: scale(1.8);
-      z-index: 1000;
-      position: relative;
-      cursor: zoom-out;
-    }
-
-    .upload-container {
-      text-align: center;
-      margin: 15px 0;
-    }
-
-    .upload-preview {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-top: 10px;
-    }
-
-    .map-link {
-      display: block;
-      background-color: #34a853;
-      color: white;
-      text-align: center;
-      padding: 12px;
-      text-decoration: none;
-      border-radius: 8px;
-      margin-bottom: 25px;
-      font-weight: bold;
-      transition: background 0.3s;
-      word-break: break-word;
-    }
-
-    .map-link:hover {
-      background-color: #2c8c46;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 15px;
       background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
-    input, select, textarea, button {
-      padding: 10px;
+    section {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 1rem;
-      width: 100%;
+      box-sizing: border-box;
+      font-size: 1em;
     }
 
     button {
-      background-color: #1a73e8;
+      background: #0073e6;
       color: white;
       border: none;
+      padding: 10px 16px;
+      margin-top: 15px;
+      border-radius: 5px;
       cursor: pointer;
-      font-weight: bold;
+      font-size: 1em;
     }
 
     button:hover {
-      background-color: #155ab6;
+      background: #005bb5;
     }
 
-    .chart-container {
-      margin-top: 30px;
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    #piechart {
+      max-width: 500px;
+      margin: 0 auto;
     }
 
-    .responses {
-      margin-top: 20px;
-      background: white;
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      font-size: 0.95rem;
+    .enlarged {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
     }
 
-    @media (max-width: 600px) {
-      header {
-        font-size: 1rem;
-        padding: 1rem;
+    .enlarged img {
+      width: 95%;
+      max-width: 900px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.3em;
       }
-      .main-image.enlarged {
-        transform: scale(1.4);
+      main {
+        margin: 10px;
+        padding: 10px;
       }
     }
   </style>
 </head>
+
 <body>
   <header>
-    Changing the Left Turn Signal Light into a Yield Signal Light
+    <h1>Changing the Left Turn Signal Light into a Yield Signal Light.</h1>
+    <img src="20251017_092217.jpg" alt="Street intersection at Madison" class="main-image" onclick="enlargeImage(this)">
+    <div class="header-links">
+      <a href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu&g_ep=EgoyMDI1MTAxNC4wIKXMDSoASAFQAw%3D%3D"
+         target="_blank" class="street-view-link">
+        View Location on Google Street View
+      </a>
+    </div>
   </header>
 
   <main>
-    <div class="image-container">
-      <img src="https://via.placeholder.com/700x400?text=Proposed+Signal+Change+Location" alt="Project Image" class="main-image" id="mainImage">
-    </div>
+    <section>
+      <h2>Community Feedback Form</h2>
+      <form id="surveyForm">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" required>
 
-    <div class="upload-container">
-      <label for="photoUpload">Upload a photo (optional):</label>
-      <input type="file" id="photoUpload" accept="image/*">
-      <img id="photoPreview" class="upload-preview" style="display:none;">
-    </div>
+        <label for="email">Email (kept private):</label>
+        <input type="email" id="email" required>
 
-    <a class="map-link" 
-       href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu&g_ep=EgoyMDI1MTAxNC4wIKXMDSoASAFQAw%3D%3D" 
-       target="_blank">
-      🌎 View Location on Google Street View
-    </a>
+        <label for="city">City of Residence:</label>
+        <input type="text" id="city" required>
 
-    <form id="surveyForm">
-      <input type="text" id="name" placeholder="Full Name" required>
-      <input type="email" id="email" placeholder="Email (not public)" required>
-      <input type="text" id="city" placeholder="City of Residence" required>
+        <label for="photoUpload">Upload Photo (optional):</label>
+        <input type="file" id="photoUpload" accept="image/*">
 
-      <label>Do you support changing the signal?</label>
-      <select id="support" required>
-        <option value="">Select...</option>
-        <option value="yes">Yes, I support it</option>
-        <option value="no">No, I do not support it</option>
-      </select>
+        <label>Do you want this project done?</label>
+        <select id="vote" required>
+          <option value="">Select one</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
 
-      <label>Additional Comments:</label>
-      <textarea id="comments" rows="3" placeholder="Your thoughts..."></textarea>
+        <label for="comments">Comments:</label>
+        <textarea id="comments" rows="4"></textarea>
 
-      <button type="submit">Submit Response</button>
-    </form>
+        <button type="submit">Submit Response</button>
+      </form>
+    </section>
 
-    <div class="chart-container">
-      <canvas id="supportChart"></canvas>
-    </div>
+    <section>
+      <h2>Community Support Chart</h2>
+      <canvas id="piechart"></canvas>
+    </section>
 
-    <div class="responses" id="responses"></div>
+    <section>
+      <h3>Responses (Initials and City)</h3>
+      <ul id="responses"></ul>
+    </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // Enlarge main image
-    const mainImage = document.getElementById('mainImage');
-    mainImage.addEventListener('click', () => {
-      mainImage.classList.toggle('enlarged');
-    });
+    const ctx = document.getElementById('piechart').getContext('2d');
+    let yesVotes = 0;
+    let noVotes = 0;
 
-    // Photo upload preview
-    const photoUpload = document.getElementById('photoUpload');
-    const photoPreview = document.getElementById('photoPreview');
-    photoUpload.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          photoPreview.src = event.target.result;
-          photoPreview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Initialize chart
-    const ctx = document.getElementById('supportChart').getContext('2d');
-    const chartData = { yes: 0, no: 0 };
     const chart = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: ['Support', 'Do Not Support'],
+        labels: ['Yes', 'No'],
         datasets: [{
-          data: [0, 0],
-          backgroundColor: ['#1a73e8', '#e84545']
+          data: [yesVotes, noVotes],
+          backgroundColor: ['#4CAF50', '#F44336'],
         }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
       }
     });
 
-    // Handle form submission
     const form = document.getElementById('surveyForm');
-    const responsesDiv = document.getElementById('responses');
+    const responsesList = document.getElementById('responses');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', e => {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const city = document.getElementById('city').value.trim();
-      const support = document.getElementById('support').value;
+      const vote = document.getElementById('vote').value;
       const comments = document.getElementById('comments').value.trim();
+      const photo = document.getElementById('photoUpload').files[0];
 
-      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-      responsesDiv.innerHTML += `<p><strong>${initials}</strong> from ${city} — <em>${support === 'yes' ? 'Supports' : 'Does not support'}</em></p>`;
+      if (vote === 'yes') yesVotes++;
+      else if (vote === 'no') noVotes++;
 
-      chartData[support]++;
-      chart.data.datasets[0].data = [chartData.yes, chartData.no];
+      chart.data.datasets[0].data = [yesVotes, noVotes];
       chart.update();
 
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+      const li = document.createElement('li');
+      li.textContent = `${initials} (${city}) - ${vote === 'yes' ? 'Supports' : 'Does not support'} project`;
+      responsesList.appendChild(li);
+
       form.reset();
-      photoPreview.style.display = 'none';
+      alert('Thank you! Your response has been recorded.');
     });
+
+    function enlargeImage(img) {
+      const overlay = document.createElement('div');
+      overlay.classList.add('enlarged');
+      const enlargedImg = document.createElement('img');
+      enlargedImg.src = img.src;
+      overlay.appendChild(enlargedImg);
+      document.body.appendChild(overlay);
+      overlay.onclick = () => overlay.remove();
+    }
   </script>
 </body>
 </html>
