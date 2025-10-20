@@ -71,6 +71,7 @@
       margin-bottom: 25px;
       font-weight: bold;
       transition: background 0.3s;
+      word-break: break-word;
     }
 
     .map-link:hover {
@@ -151,7 +152,9 @@
       <img id="photoPreview" class="upload-preview" style="display:none;">
     </div>
 
-    <a class="map-link" href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu" target="_blank">
+    <a class="map-link" 
+       href="https://www.google.com/maps/@33.8035898,-118.3478153,3a,75y,119.43h,82.47t/data=!3m7!1e1!3m5!1saBvGwbbxEftreUXZ-yXZEg!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fcb_client%3Dmaps_sv.tactile%26w%3D900%26h%3D600%26pitch%3D7.525540653301817%26panoid%3DaBvGwbbxEftreUXZ-yXZEg%26yaw%3D119.42830978205909!7i16384!8i8192?entry=ttu&g_ep=EgoyMDI1MTAxNC4wIKXMDSoASAFQAw%3D%3D" 
+       target="_blank">
       🌎 View Location on Google Street View
     </a>
 
@@ -181,7 +184,7 @@
   </main>
 
   <script>
-    // Image enlarge feature
+    // Enlarge main image
     const mainImage = document.getElementById('mainImage');
     mainImage.addEventListener('click', () => {
       mainImage.classList.toggle('enlarged');
@@ -216,7 +219,7 @@
       }
     });
 
-    // Form submission
+    // Handle form submission
     const form = document.getElementById('surveyForm');
     const responsesDiv = document.getElementById('responses');
 
